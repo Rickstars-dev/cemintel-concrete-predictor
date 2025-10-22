@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768">
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2b5f8f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1c4a73;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e67e22;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f39c12;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Blue hexagonal C shape -->
+  <path fill="url(#blueGrad)" d="M 285 197 L 390 197 L 480 285 L 480 345 L 390 345 L 330 285 L 330 483 L 390 543 L 480 543 L 480 603 L 390 603 L 285 498 L 285 197 Z"/>
+  <path fill="url(#blueGrad)" d="M 390 197 L 495 292 L 495 345 L 480 345 L 480 285 L 390 197 Z"/>
+  <path fill="url(#blueGrad)" d="M 390 603 L 480 603 L 495 588 L 495 543 L 480 543 L 390 603 Z"/>
+  
+  <!-- Orange growth arrow -->
+  <path fill="url(#orangeGrad)" d="M 260 420 L 310 370 L 350 410 L 400 360 L 450 410 L 470 390 L 470 340 L 520 340 L 520 390 L 540 370 L 540 450 L 470 450 L 470 420 L 450 440 L 400 390 L 350 440 L 310 400 L 280 430 L 260 420 Z"/>
+  
+  <!-- Text -->
+  <text x="200" y="620" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="#2b5f8f">CemIntel</text>
+</svg>

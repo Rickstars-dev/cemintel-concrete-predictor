@@ -1,0 +1,1267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>CemIntel · Human-Centered Concrete Intelligence</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--bg: #f7f3ec;
+			--bg-alt: #fffdf8;
+			--surface: rgba(255, 255, 255, 0.94);
+			--surface-strong: rgba(255, 255, 255, 0.98);
+			--surface-soft: rgba(255, 255, 255, 0.82);
+			--text: #1f2937;
+			--text-soft: #4b5563;
+			--accent: #ff6b35;
+			--accent-dark: #d7532a;
+			--accent-soft: rgba(255, 107, 53, 0.12);
+			--info: #2563eb;
+			--success: #16a34a;
+			--danger: #dc2626;
+			--border: rgba(15, 23, 42, 0.08);
+			--shadow-soft: 0 22px 44px rgba(15, 23, 42, 0.12);
+			--shadow-card: 0 16px 32px rgba(15, 23, 42, 0.16);
+			--shadow-small: 0 12px 24px rgba(15, 23, 42, 0.12);
+		}
+
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		html { scroll-behavior: smooth; }
+		body {
+			font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+			background: linear-gradient(160deg, var(--bg) 0%, var(--bg-alt) 44%, #f0eadf 100%);
+			color: var(--text);
+			line-height: 1.65;
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+		body::before {
+			content: '';
+			position: fixed;
+			inset: 0;
+			background-image: url("data:image/svg+xml,%3Csvg width='140' height='140' viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239aa3b8' fill-opacity='0.04' fill-rule='evenodd'%3E%3Cpath d='M70 0l70 40v60l-70 40-70-40V40z'/%3E%3C/g%3E%3C/svg%3E");
+			pointer-events: none;
+			z-index: -2;
+		}
+		body::after {
+			content: '';
+			position: fixed;
+			inset: 0;
+			background: radial-gradient(circle at 10% 20%, rgba(255, 107, 53, 0.2), transparent 42%),
+						radial-gradient(circle at 78% 14%, rgba(37, 99, 235, 0.18), transparent 40%),
+						radial-gradient(circle at 48% 82%, rgba(22, 163, 74, 0.18), transparent 42%);
+			pointer-events: none;
+			z-index: -1;
+		}
+		a { text-decoration: none; color: inherit; }
+		button { font: inherit; border: none; background: none; cursor: pointer; }
+
+		.glow {
+			position: fixed;
+			width: 220px;
+			height: 220px;
+			border-radius: 60%;
+			filter: blur(80px);
+			mix-blend-mode: screen;
+			opacity: 0.45;
+			z-index: -1;
+			animation: floaty 12s ease-in-out infinite;
+		}
+		.glow.one { background: rgba(255, 107, 53, 0.32); top: 12%; left: 8%; }
+		.glow.two { background: rgba(37, 99, 235, 0.26); top: 20%; right: 14%; animation-delay: 3s; }
+		.glow.three { background: rgba(22, 163, 74, 0.24); bottom: 12%; left: 10%; animation-delay: 5s; }
+
+		.header {
+			text-align: center;
+			padding: 48px 24px 32px;
+		}
+		.brand {
+			display: inline-flex;
+			align-items: center;
+			gap: 16px;
+			font-size: 2.2rem;
+			font-weight: 700;
+			animation: glow-pulse 3s ease-in-out infinite;
+		}
+		.brand span:last-child {
+			font-family: 'Caveat', cursive;
+			font-size: 2.6rem;
+			color: var(--accent-dark);
+			letter-spacing: 0.4px;
+			text-shadow: 0 0 20px rgba(255, 107, 53, 0.4),
+			             0 0 40px rgba(255, 107, 53, 0.2),
+			             0 0 60px rgba(255, 107, 53, 0.1);
+		}
+		@keyframes glow-pulse {
+			0%, 100% { 
+				filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.3));
+			}
+			50% { 
+				filter: drop-shadow(0 0 16px rgba(255, 107, 53, 0.5)) drop-shadow(0 0 24px rgba(255, 107, 53, 0.3));
+			}
+		}
+
+		.page { display: none; }
+		.page.active { display: block; }
+
+		.home-wrap {
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 110px 24px 96px;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+			gap: 56px;
+			align-items: center;
+		}
+		.hero-note {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 8px 16px;
+			border-radius: 999px;
+			background: var(--accent-soft);
+			color: var(--accent-dark);
+			font-weight: 600;
+			margin-bottom: 20px;
+		}
+		.hero-note span { font-family: 'Caveat', cursive; font-size: 1.1rem; }
+		.hero-title {
+			font-size: clamp(2.7rem, 4vw, 3.8rem);
+			line-height: 1.05;
+			letter-spacing: -0.5px;
+			margin-bottom: 24px;
+		}
+		.hero-title strong {
+			color: var(--accent);
+			position: relative;
+			display: inline-block;
+		}
+		.hero-title strong::after {
+			content: '';
+			position: absolute;
+			left: 0;
+			bottom: 4px;
+			width: 100%;
+			height: 8px;
+			border-radius: 999px;
+			background: rgba(255, 107, 53, 0.28);
+		}
+		.hero-lede {
+			font-size: 1.05rem;
+			color: var(--text-soft);
+			max-width: 520px;
+			margin-bottom: 30px;
+		}
+		.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+		.btn {
+			padding: 16px 30px;
+			border-radius: 999px;
+			font-weight: 600;
+			font-size: 1rem;
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			transition: transform 0.25s ease, box-shadow 0.25s ease;
+		}
+		.btn-primary {
+			background: linear-gradient(135deg, var(--accent), #ff925d);
+			color: #fff;
+			box-shadow: 0 18px 40px rgba(255, 107, 53, 0.3);
+		}
+		.btn-secondary {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-small);
+			color: var(--text);
+		}
+		.btn:hover { transform: translateY(-4px); }
+
+		.sketch-board { display: grid; gap: 20px; }
+		.sketch-card,
+		.sketch-mini {
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			border-radius: 22px;
+			padding: 24px 26px;
+			box-shadow: var(--shadow-card);
+			position: relative;
+			overflow: hidden;
+		}
+		.sketch-card::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.42), transparent 58%);
+		}
+		.sketch-label { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.82rem; color: var(--text-soft); margin-bottom: 12px; }
+		.sketch-value { font-size: 2.5rem; font-weight: 700; }
+		.sketch-note { margin-top: 16px; font-family: 'Caveat', cursive; font-size: 1.18rem; color: var(--accent-dark); }
+		.sketch-row { display: flex; gap: 18px; }
+		.sketch-mini { flex: 1; border-style: dashed; border-color: rgba(15, 23, 42, 0.16); }
+		.sketch-mini span { display: block; font-size: 0.88rem; color: var(--text-soft); margin-top: 6px; }
+
+		.section { max-width: 1180px; margin: 0 auto; padding: 0 24px 92px; }
+		.section-head { text-align: center; margin-bottom: 48px; }
+		.section-head h2 { font-size: clamp(2rem, 3vw, 2.65rem); margin-bottom: 12px; }
+		.section-head p { color: var(--text-soft); max-width: 620px; margin: 0 auto; }
+
+		.stat-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 24px;
+			margin-bottom: 72px;
+		}
+		.stat-card {
+			padding: 26px;
+			border-radius: 22px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+			position: relative;
+			overflow: hidden;
+		}
+		.stat-card::before {
+			content: '';
+			position: absolute;
+			width: 110px;
+			height: 110px;
+			border-radius: 50%;
+			background: rgba(255, 107, 53, 0.14);
+			top: -46px;
+			right: -40px;
+		}
+		.stat-title { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.84rem; color: var(--text-soft); margin-bottom: 14px; }
+		.stat-value { font-size: 2.4rem; font-weight: 700; }
+		.stat-footnote { margin-top: 14px; color: var(--text-soft); }
+		.progress-track { height: 8px; border-radius: 999px; background: rgba(15, 23, 42, 0.08); overflow: hidden; margin-top: 18px; }
+		.progress-fill { width: 0; height: 100%; background: linear-gradient(135deg, var(--accent), #ff9a6c); border-radius: inherit; transition: width 0.9s ease; }
+
+		.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+		.feature-card {
+			padding: 26px;
+			border-radius: 24px;
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+			position: relative;
+			overflow: hidden;
+			transition: transform 0.3s ease;
+		}
+		.feature-card::after {
+			content: '';
+			position: absolute;
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			background: rgba(37, 99, 235, 0.16);
+			top: -50px;
+			left: -38px;
+		}
+		.feature-card:hover { transform: translateY(-6px); }
+		.feature-icon { font-size: 2.1rem; margin-bottom: 16px; position: relative; z-index: 1; }
+		.feature-card h3 { font-size: 1.26rem; margin-bottom: 10px; position: relative; z-index: 1; }
+		.feature-card p { color: var(--text-soft); position: relative; z-index: 1; }
+
+		.timeline {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+			gap: 24px;
+			margin-top: 50px;
+		}
+		.timeline-step {
+			padding: 28px;
+			border-radius: 24px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-small);
+			position: relative;
+			overflow: hidden;
+		}
+		.timeline-step::before {
+			content: attr(data-step);
+			position: absolute;
+			right: 22px;
+			top: 18px;
+			font-size: 2.3rem;
+			font-weight: 700;
+			color: rgba(255, 107, 53, 0.22);
+		}
+		.timeline-step h4 { font-size: 1.18rem; margin-bottom: 10px; }
+		.timeline-step p { color: var(--text-soft); }
+
+		.gallery {
+			margin-top: 66px;
+			padding: 56px 34px;
+			border-radius: 30px;
+			background: linear-gradient(140deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.76));
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+		}
+		.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 34px; }
+		.gallery-card {
+			position: relative;
+			border-radius: 24px;
+			overflow: hidden;
+			box-shadow: var(--shadow-card);
+			min-height: 252px;
+		}
+		.gallery-card img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.05); }
+		.gallery-caption {
+			position: absolute;
+			inset: auto 0 0;
+			padding: 22px;
+			background: linear-gradient(180deg, rgba(17, 24, 39, 0) 0%, rgba(17, 24, 39, 0.78) 96%);
+			color: #fff;
+		}
+
+		.dataset-card {
+			padding: 46px;
+			border-radius: 30px;
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 32px;
+			align-items: start;
+		}
+		.dataset-card ul { list-style: none; display: grid; gap: 12px; margin-top: 24px; }
+		.dataset-card li { position: relative; padding-left: 28px; color: var(--text-soft); }
+		.dataset-card li::before {
+			content: '✔';
+			position: absolute;
+			left: 0;
+			top: 0;
+			color: var(--success);
+			font-weight: 700;
+		}
+
+		.cta-panel {
+			margin: 96px auto 112px;
+			padding: 46px 48px;
+			border-radius: 32px;
+			background: linear-gradient(140deg, rgba(255, 107, 53, 0.16), rgba(255, 255, 255, 0.88));
+			border: 1px solid rgba(255, 107, 53, 0.32);
+			box-shadow: var(--shadow-soft);
+			display: grid;
+			gap: 18px;
+			justify-items: center;
+			text-align: center;
+		}
+		.cta-buttons { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+
+		.footer { text-align: center; padding: 70px 24px 54px; color: rgba(17, 24, 39, 0.65); font-size: 0.95rem; }
+		.footer span { color: var(--accent-dark); font-weight: 600; }
+
+		.page-hero { text-align: center; padding: 118px 24px 68px; }
+		.page-hero p { color: var(--text-soft); max-width: 640px; margin: 0 auto 26px; }
+		.back-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 18px;
+			border-radius: 999px;
+			border: 1px solid var(--border);
+			background: rgba(255, 255, 255, 0.88);
+			font-weight: 600;
+			transition: transform 0.3s ease;
+		}
+		.back-link:hover { transform: translateY(-3px); }
+
+		.content-wrap { max-width: 1180px; margin: -58px auto 96px; padding: 0 24px 120px; }
+		.form-card {
+			padding: 40px;
+			border-radius: 28px;
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+		}
+		.form-card h2 { font-size: 1.8rem; margin-bottom: 24px; }
+		.input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 22px; }
+		.input-wrap { display: flex; flex-direction: column; gap: 8px; }
+		.input-wrap label {
+			font-weight: 600;
+			color: var(--text);
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.input-wrap label span {
+			display: inline-flex;
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background: var(--accent-soft);
+			color: var(--accent-dark);
+			align-items: center;
+			justify-content: center;
+		}
+		.input-wrap input {
+			padding: 14px 16px;
+			border: 1px solid rgba(15, 23, 42, 0.16);
+			border-radius: 14px;
+			background: rgba(255, 255, 255, 0.95);
+			font-size: 1rem;
+			transition: border 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+		}
+		.input-wrap input:focus {
+			outline: none;
+			border-color: var(--accent);
+			box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.18);
+			transform: translateY(-2px);
+		}
+		.input-help { font-size: 0.84rem; color: var(--text-soft); }
+		.section-label {
+			margin-top: 34px;
+			font-size: 1.1rem;
+			font-weight: 600;
+			border-bottom: 1px dashed rgba(15, 23, 42, 0.18);
+			padding-bottom: 12px;
+			margin-bottom: 18px;
+		}
+		.primary-action {
+			margin: 34px auto 0;
+			display: inline-flex;
+			align-items: center;
+			gap: 12px;
+			padding: 16px 34px;
+			border-radius: 999px;
+			background: linear-gradient(135deg, var(--accent), #ff8f5c);
+			color: #fff;
+			font-weight: 700;
+			box-shadow: 0 18px 40px rgba(255, 107, 53, 0.32);
+			transition: transform 0.3s ease;
+		}
+		.primary-action:hover { transform: translateY(-4px); }
+
+		.loading-box { margin-top: 32px; text-align: center; display: none; }
+		.loading-box.active { display: block; }
+		.loading-spinner {
+			width: 56px;
+			height: 56px;
+			border-radius: 50%;
+			border: 6px solid rgba(17, 24, 39, 0.08);
+			border-top-color: var(--accent);
+			margin: 0 auto 12px;
+			animation: spin 0.9s linear infinite;
+		}
+
+		.results-panel {
+			margin-top: 36px;
+			padding: 34px;
+			border-radius: 26px;
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+			display: none;
+			opacity: 0;
+			transform: translateY(16px);
+			transition: opacity 0.35s ease, transform 0.35s ease;
+		}
+		.results-panel.active {
+			display: block;
+			opacity: 1;
+			transform: translateY(0);
+		}
+		.results-head {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			align-items: center;
+			gap: 14px;
+			margin-bottom: 24px;
+		}
+		.results-badge {
+			padding: 8px 14px;
+			border-radius: 999px;
+			background: rgba(37, 99, 235, 0.12);
+			color: var(--info);
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
+		.result-value { text-align: center; font-size: clamp(3rem, 5vw, 4rem); font-weight: 700; }
+		.result-sub { text-align: center; color: var(--text-soft); margin-bottom: 14px; }
+		.rating-stars { text-align: center; font-size: 2rem; margin: 6px 0; color: #facc15; }
+		.rating-text { text-align: center; font-weight: 600; margin-bottom: 28px; }
+
+		.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+		.metric-card {
+			padding: 20px;
+			border-radius: 18px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-small);
+		}
+		.metric-label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.84rem; color: var(--text-soft); margin-bottom: 10px; }
+		.metric-note { margin-top: 8px; font-size: 0.85rem; color: var(--text-soft); }
+
+		.suitability h3 { font-size: 1.18rem; margin-bottom: 14px; }
+		.suitability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+		.suitability-pill { padding: 12px 14px; border-radius: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+		.suitability-pill.ok { background: rgba(22, 163, 74, 0.15); color: var(--success); }
+		.suitability-pill.no { background: rgba(220, 38, 38, 0.14); color: var(--danger); }
+
+		.chart-box {
+			margin-top: 32px;
+			border-radius: 22px;
+			border: 1px solid var(--border);
+			padding: 24px;
+			background: var(--surface);
+			box-shadow: var(--shadow-small);
+			height: 340px;
+		}
+
+		.mix-box {
+			margin-top: 36px;
+			padding: 32px;
+			border-radius: 26px;
+			background: var(--surface-strong);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-soft);
+			display: none;
+		}
+		.mix-box.active { display: block; }
+		.mix-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+		.mix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+		.mix-card {
+			padding: 26px;
+			border-radius: 22px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			box-shadow: var(--shadow-small);
+			position: relative;
+			overflow: hidden;
+		}
+		.mix-card::after {
+			content: attr(data-badge);
+			position: absolute;
+			top: 18px;
+			right: 18px;
+			padding: 6px 14px;
+			border-radius: 999px;
+			font-size: 0.82rem;
+			font-weight: 700;
+			color: #fff;
+			background: linear-gradient(135deg, var(--info), #6ea8ff);
+			box-shadow: 0 12px 22px rgba(37, 99, 235, 0.24);
+		}
+		.mix-card[data-badge="Most Economical"]::after { background: linear-gradient(135deg, var(--success), #64d49a); }
+		.mix-card[data-badge="High Performance"]::after { background: linear-gradient(135deg, var(--danger), #f28297); }
+		.mix-highlight { margin: 16px 0; padding: 12px 14px; border-radius: 16px; background: rgba(37, 99, 235, 0.12); color: var(--info); font-weight: 600; font-size: 0.95rem; }
+		.mix-props { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 12px 16px; }
+		.mix-prop { padding: 12px; border-radius: 16px; background: rgba(255, 255, 255, 0.92); border: 1px solid var(--border); }
+		.mix-prop span { display: block; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); }
+
+		.reveal { opacity: 0; transform: translateY(24px) scale(0.98); transition: opacity 0.6s ease, transform 0.6s ease; }
+		.reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+		@keyframes floaty {
+			0%, 100% { transform: translate3d(0, 0, 0); }
+			50% { transform: translate3d(18px, -18px, 0); }
+		}
+		@keyframes spin {
+			from { transform: rotate(0deg); }
+			to { transform: rotate(360deg); }
+		}
+
+		@media (max-width: 1024px) {
+			.nav-links { gap: 6px; }
+			.nav-link { padding: 10px 14px; font-size: 0.88rem; }
+			.home-wrap { padding-top: 96px; }
+		}
+		@media (max-width: 768px) {
+			.nav-bar { flex-direction: column; align-items: stretch; }
+			.nav-links { justify-content: space-between; width: 100%; }
+			.sketch-row { flex-direction: column; }
+			.gallery { padding: 40px 22px; }
+			.dataset-card { padding: 34px; }
+			.form-card { padding: 32px; }
+			.cta-panel { padding: 34px; }
+		}
+		@media (max-width: 540px) {
+			.btn { width: 100%; justify-content: center; }
+			.hero-actions { flex-direction: column; }
+			.gallery-card { min-height: 220px; }
+			.mix-props { grid-template-columns: 1fr; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation-duration: 0.01ms !important;
+				animation-iteration-count: 1 !important;
+				transition-duration: 0.01ms !important;
+				scroll-behavior: auto !important;
+			}
+			.reveal { opacity: 1; transform: none; }
+		}
+	</style>
+</head>
+<body>
+	<div class="glow one"></div>
+	<div class="glow two"></div>
+	<div class="glow three"></div>
+
+	<header class="header">
+		<div class="brand" style="flex-direction: column; gap: 12px;">
+			<img src="/static/cemintel_logo.png" alt="CemIntel Logo" style="height: 150px; width: auto; max-width: 95vw;">
+			<div style="font-family: 'Inter', sans-serif; font-size: 3.5rem; font-weight: 700; letter-spacing: -0.5px;">
+				<span style="color: #2b5f8f;">Cem</span><span style="color: #1c4a73;">Intel</span>
+			</div>
+			<p style="font-size: 1rem; color: #4b5563; margin: 0;">Human-Centered Concrete Intelligence</p>
+		</div>
+	</header>
+
+	<main>
+		<section class="page active" id="homePage">
+			<div class="home-wrap">
+				<div class="hero-copy">
+					<div class="hero-note">Made for builders <span>by Abhishek Chandra</span></div>
+					<h1 class="hero-title">Give your mixes a <strong data-hero-word>human</strong> AI co-pilot.</h1>
+					<p class="hero-lede">CemIntel blends machine intelligence with a hand-crafted workflow. Predict compressive strength, explore optimized recipes, and balance cost with carbon—without losing the feel of a site journal.</p>
+					<div class="hero-actions">
+						<button class="btn btn-primary" data-page="predict">✨ Predict a mix</button>
+						<button class="btn btn-secondary" data-page="optimize">🧪 Suggest recipes</button>
+					</div>
+				</div>
+				<div class="sketch-board">
+					<article class="sketch-card reveal" data-count-item data-count="92.6" data-decimals="1" data-suffix="%">
+						<div class="sketch-label">Model accuracy</div>
+						<div class="sketch-value">0</div>
+						<p class="sketch-note">Gradient Boosting tuned on 1,030 verified tests.</p>
+					</article>
+					<div class="sketch-row">
+						<article class="sketch-mini reveal" data-count-item data-count="75" data-suffix="+">
+							<div class="sketch-value">0</div>
+							<span>mix permutations assessed per prediction</span>
+						</article>
+						<article class="sketch-mini reveal" data-count-item data-count="365" data-suffix=" days">
+							<div class="sketch-value">0</div>
+							<span>strength predictions from 1 to 365 days</span>
+						</article>
+					</div>
+				</div>
+			</div>
+
+			<section class="section">
+				<div class="stat-grid">
+					<article class="stat-card reveal" data-progress="92.6" data-count-item data-count="92.6" data-decimals="1" data-suffix="%">
+						<div class="stat-title">Prediction confidence</div>
+						<div class="stat-value">0</div>
+						<p class="stat-footnote">R² verified on the UCI Concrete Strength dataset.</p>
+						<div class="progress-track"><div class="progress-fill"></div></div>
+					</article>
+					<article class="stat-card reveal" data-progress="1030" data-count-item data-count="1030" data-suffix="">
+						<div class="stat-title">Training samples</div>
+						<div class="stat-value">0</div>
+						<p class="stat-footnote">Real-world concrete formulations from the UCI dataset.</p>
+						<div class="progress-track"><div class="progress-fill"></div></div>
+					</article>
+					<article class="stat-card reveal" data-progress="77" data-count-item data-count="77" data-suffix="%">
+						<div class="stat-title">SCM representation</div>
+						<div class="stat-value">0</div>
+						<p class="stat-footnote">Dataset includes eco-friendly slag and fly ash mixtures.</p>
+						<div class="progress-track"><div class="progress-fill"></div></div>
+					</article>
+				</div>
+
+				<div class="section-head reveal">
+					<h2>Feels handcrafted, backed by hard data</h2>
+					<p>Sketchbook tags, patient animations, and contextual language keep teams engaged while the model crunches the numbers.</p>
+				</div>
+
+				<div class="feature-grid">
+					<article class="feature-card reveal">
+						<div class="feature-icon">⚡</div>
+						<h3>Instant strength insight</h3>
+						<p>Predict compressive strength across curing ages in seconds. No more waiting 28 days for cubes.</p>
+					</article>
+					<article class="feature-card reveal" style="transition-delay: 0.08s;">
+						<div class="feature-icon">💰</div>
+						<h3>Cost & CO₂ in sync</h3>
+						<p>View per m³ cost alongside carbon footprint and water/cement health in one warm dashboard.</p>
+					</article>
+					<article class="feature-card reveal" style="transition-delay: 0.16s;">
+						<div class="feature-icon">🛠️</div>
+						<h3>Site-ready guidance</h3>
+						<p>Friendly prompts and sanity cues make CemIntel feel like a veteran engineer at your elbow.</p>
+					</article>
+					<article class="feature-card reveal" style="transition-delay: 0.24s;">
+						<div class="feature-icon">📈</div>
+						<h3>Living charts</h3>
+						<p>Strength development curves respond instantly as you tweak inputs—evidence for every decision.</p>
+					</article>
+				</div>
+
+				<div class="timeline">
+					<article class="timeline-step reveal" data-step="01">
+						<h4>Capture your mix</h4>
+						<p>Enter batch proportions, additives, and local prices. CemIntel checks for realistic ranges in-line.</p>
+					</article>
+					<article class="timeline-step reveal" data-step="02">
+						<h4>Read the signals</h4>
+						<p>Get predicted MPa, water/cement feedback, cost, CO₂, and suitability badges at a glance.</p>
+					</article>
+					<article class="timeline-step reveal" data-step="03">
+						<h4>Explore options</h4>
+						<p>Switch to optimizer mode for economical, balanced, and performance mixes tuned to your target.</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="section">
+				<div class="gallery reveal">
+					<div class="section-head" style="margin-bottom: 24px;">
+						<h2>The CemIntel field log</h2>
+						<p>Hover to feel the depth—because real jobsites are never flat.</p>
+					</div>
+					<div class="gallery-grid">
+						<figure class="gallery-card">
+							<img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=900&h=900&fit=crop&q=80" alt="Concrete batching">
+							<figcaption class="gallery-caption">
+								<h5>Precision mixing</h5>
+								<span>Model calibrations grounded in lab-grade batching.</span>
+							</figcaption>
+						</figure>
+						<figure class="gallery-card">
+							<img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&h=900&fit=crop&q=80" alt="Modern construction site">
+							<figcaption class="gallery-caption">
+								<h5>Modern builds</h5>
+								<span>Dashboards keep site crews aligned with design intent.</span>
+							</figcaption>
+						</figure>
+						<figure class="gallery-card">
+							<img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=900&h=900&fit=crop&q=80" alt="Concrete lab">
+							<figcaption class="gallery-caption">
+								<h5>Lab-verified data</h5>
+								<span>1,030 compressive tests inform every recommendation.</span>
+							</figcaption>
+						</figure>
+					</div>
+				</div>
+			</section>
+
+			<section class="section">
+				<article class="dataset-card reveal">
+					<div>
+						<h2>Built on the UCI Concrete dataset</h2>
+						<p>CemIntel stands on Prof. I-Cheng Yeh’s celebrated dataset. We layer modern ML while keeping the engineering classic.</p>
+						<ul>
+							<li>Gradient Boosting trained on 1,030 real lab samples.</li>
+							<li>Strength coverage: 2.33 – 82.60 MPa across 1–365 day ages.</li>
+							<li>Captures fly ash, slag, and high-performance additive blends.</li>
+							<li>92.6% R² with ±2.89 MPa MAE.</li>
+						</ul>
+					</div>
+					<div>
+						<p style="font-family: 'Caveat', cursive; font-size: 1.6rem; color: var(--accent-dark);">“Reliable predictions begin with reliable data.”</p>
+						<p style="color: var(--text-soft);">Civil Engineering Research Collective</p>
+					</div>
+				</article>
+			</section>
+
+			<section class="cta-panel reveal">
+				<h2>Ready to turn specs into confident pours?</h2>
+				<p>Spin up a prediction or craft three mix scenarios. CemIntel keeps humans in the loop while the model shoulders the math.</p>
+				<div class="cta-buttons">
+					<button class="btn btn-primary" data-page="predict">🧮 Predict my mix</button>
+					<button class="btn btn-secondary" data-page="optimize">🎯 Optimize for target MPa</button>
+				</div>
+			</section>
+		</section>
+
+		<section class="page" id="predictPage">
+			<header class="page-hero">
+				<h1>Predict concrete strength</h1>
+				<p>Feed in your mix design to get a confidence-backed prediction with water/cement advice, cost breakdown, and a strength development curve.</p>
+				<button class="back-link" data-page="home">⬅ Back to Home</button>
+			</header>
+
+			<div class="content-wrap">
+				<section class="form-card">
+					<h2>Mix components</h2>
+					<form id="predictionForm">
+						<div class="input-grid">
+							<div class="input-wrap">
+								<label for="cement"><span>🏭</span>Cement (kg/m³)</label>
+								<input id="cement" name="cement" type="number" step="0.1" min="102" max="540" value="350" required>
+								<div class="input-help">Typical range 102 – 540</div>
+							</div>
+							<div class="input-wrap">
+								<label for="water"><span>💧</span>Water (kg/m³)</label>
+								<input id="water" name="water" type="number" step="0.1" min="121" max="247" value="180" required>
+								<div class="input-help">Watch the W/C ratio 0.4 – 0.6</div>
+							</div>
+							<div class="input-wrap">
+								<label for="blast_furnace_slag"><span>♻️</span>Blast furnace slag</label>
+								<input id="blast_furnace_slag" name="blast_furnace_slag" type="number" step="0.1" min="0" max="359" value="0" required>
+								<div class="input-help">Eco-friendly cement replacement</div>
+							</div>
+							<div class="input-wrap">
+								<label for="fly_ash"><span>🪶</span>Fly ash</label>
+								<input id="fly_ash" name="fly_ash" type="number" step="0.1" min="0" max="200" value="0" required>
+								<div class="input-help">Improves long-term strength</div>
+							</div>
+							<div class="input-wrap">
+								<label for="superplasticizer"><span>🧪</span>Superplasticizer</label>
+								<input id="superplasticizer" name="superplasticizer" type="number" step="0.1" min="0" max="32" value="0" required>
+								<div class="input-help">Boosts workability without water</div>
+							</div>
+							<div class="input-wrap">
+								<label for="coarse_aggregate"><span>🪨</span>Coarse aggregate</label>
+								<input id="coarse_aggregate" name="coarse_aggregate" type="number" step="0.1" min="801" max="1145" value="1000" required>
+								<div class="input-help">Stone & gravel mass</div>
+							</div>
+							<div class="input-wrap">
+								<label for="fine_aggregate"><span>🏖️</span>Fine aggregate</label>
+								<input id="fine_aggregate" name="fine_aggregate" type="number" step="0.1" min="594" max="992" value="750" required>
+								<div class="input-help">Natural or manufactured sand</div>
+							</div>
+							<div class="input-wrap">
+								<label for="age"><span>📅</span>Age (days)</label>
+								<input id="age" name="age" type="number" step="1" min="1" max="365" value="28" required>
+								<div class="input-help">28-day cubes remain the benchmark</div>
+							</div>
+						</div>
+
+						<h3 class="section-label">Material prices (₹ per ton)</h3>
+						<div class="input-grid">
+							<div class="input-wrap">
+								<label for="price_cement"><span>💰</span>Cement</label>
+								<input id="price_cement" name="price_cement" type="number" step="100" min="1000" max="50000" value="8000" required>
+							</div>
+							<div class="input-wrap">
+								<label for="price_slag"><span>♻️</span>Slag</label>
+								<input id="price_slag" name="price_slag" type="number" step="100" min="500" max="20000" value="3000" required>
+							</div>
+							<div class="input-wrap">
+								<label for="price_fly_ash"><span>🪶</span>Fly ash</label>
+								<input id="price_fly_ash" name="price_fly_ash" type="number" step="100" min="500" max="15000" value="2500" required>
+							</div>
+							<div class="input-wrap">
+								<label for="price_aggregates"><span>🧱</span>Aggregates</label>
+								<input id="price_aggregates" name="price_aggregates" type="number" step="100" min="500" max="10000" value="1500" required>
+							</div>
+						</div>
+
+						<button type="submit" class="primary-action">🔮 Predict strength</button>
+					</form>
+
+					<div id="loading" class="loading-box">
+						<div class="loading-spinner"></div>
+						<p>Crunching the numbers…</p>
+					</div>
+
+					<div id="results" class="results-panel">
+						<div class="results-head">
+							<h2>Prediction summary</h2>
+							<div class="results-badge">Live model output</div>
+						</div>
+						<div class="result-value" id="strengthValue">0</div>
+						<div class="result-sub">MPa (megapascals)</div>
+						<div class="rating-stars" id="ratingStars"></div>
+						<div class="rating-text" id="ratingText"></div>
+
+						<div class="metric-grid">
+							<div class="metric-card">
+								<div class="metric-label">Water/cement ratio</div>
+								<div class="metric-value" id="wcRatio">0</div>
+								<div class="metric-note" id="wcStatus"></div>
+							</div>
+							<div class="metric-card">
+								<div class="metric-label">Cost per m³</div>
+								<div class="metric-value" id="cost">₹0</div>
+								<div class="metric-note" id="priceBreakdown"></div>
+							</div>
+							<div class="metric-card">
+								<div class="metric-label">CO₂ emissions</div>
+								<div class="metric-value" id="co2">0</div>
+								<div class="metric-note">Estimated kg CO₂e per m³</div>
+							</div>
+						</div>
+
+						<div class="suitability">
+							<h3>Where this mix fits</h3>
+							<div class="suitability-grid" id="suitabilityGrid"></div>
+						</div>
+
+						<div class="chart-box">
+							<canvas id="strengthChart"></canvas>
+						</div>
+					</div>
+				</section>
+			</div>
+		</section>
+
+		<section class="page" id="optimizePage">
+			<header class="page-hero">
+				<h1>Mix design optimizer</h1>
+				<p>Set a target strength and age. CemIntel will craft economical, balanced, and high-performance options with cost and carbon context.</p>
+				<button class="back-link" data-page="home">⬅ Back to Home</button>
+			</header>
+
+			<div class="content-wrap">
+				<section class="form-card">
+					<h2>Your requirements</h2>
+					<form id="optimizerForm">
+						<div class="input-grid">
+							<div class="input-wrap">
+								<label for="opt_target_strength"><span>🎯</span>Target strength (MPa)</label>
+								<input id="opt_target_strength" name="opt_target_strength" type="number" step="0.1" min="20" max="80" value="40" required>
+								<div class="input-help">Typical structural range 20 – 80 MPa</div>
+							</div>
+							<div class="input-wrap">
+								<label for="opt_age"><span>📆</span>Age (days)</label>
+								<input id="opt_age" name="opt_age" type="number" step="1" min="1" max="365" value="28" required>
+								<div class="input-help">28 days is the standard design age</div>
+							</div>
+						</div>
+
+						<h3 class="section-label">Material prices (₹ per ton)</h3>
+						<div class="input-grid">
+							<div class="input-wrap">
+								<label for="opt_price_cement"><span>🏭</span>Cement</label>
+								<input id="opt_price_cement" name="opt_price_cement" type="number" step="100" min="1000" max="50000" value="8000" required>
+							</div>
+							<div class="input-wrap">
+								<label for="opt_price_slag"><span>♻️</span>Slag</label>
+								<input id="opt_price_slag" name="opt_price_slag" type="number" step="100" min="500" max="20000" value="3000" required>
+							</div>
+							<div class="input-wrap">
+								<label for="opt_price_fly_ash"><span>🪶</span>Fly ash</label>
+								<input id="opt_price_fly_ash" name="opt_price_fly_ash" type="number" step="100" min="500" max="15000" value="2500" required>
+							</div>
+							<div class="input-wrap">
+								<label for="opt_price_aggregates"><span>🧱</span>Aggregates</label>
+								<input id="opt_price_aggregates" name="opt_price_aggregates" type="number" step="100" min="500" max="10000" value="1500" required>
+							</div>
+						</div>
+
+						<button type="submit" class="primary-action">🧪 Generate mix designs</button>
+					</form>
+
+					<div id="optimizeLoading" class="loading-box">
+						<div class="loading-spinner"></div>
+						<p>Designing your mixes…</p>
+					</div>
+
+					<div id="mixResults" class="mix-box">
+						<div class="mix-top">
+							<div>
+								<h2>Recommended mix designs</h2>
+								<p style="color: var(--text-soft);">Target <strong><span id="optResultStrength">40</span> MPa</strong> at <strong><span id="optResultAge">28</span> days</strong>.</p>
+							</div>
+						</div>
+						<div class="mix-grid" id="mixOptionsContainer"></div>
+					</div>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<footer class="footer">
+		Crafted for builders by <span>Abhishek Chandra</span> · CemIntel keeps humans in the loop.
+	</footer>
+
+	<script>
+		const pages = {
+			home: document.getElementById('homePage'),
+			predict: document.getElementById('predictPage'),
+			optimize: document.getElementById('optimizePage')
+		};
+		const navButtons = Array.from(document.querySelectorAll('[data-page]'));
+		let currentPage = 'home';
+		let strengthChart = null;
+
+		function showPage(page) {
+			if (!pages[page] || currentPage === page) {
+				return;
+			}
+			Object.values(pages).forEach(section => section.classList.remove('active'));
+			pages[page].classList.add('active');
+			currentPage = page;
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+
+		navButtons.forEach(btn => {
+			btn.addEventListener('click', () => showPage(btn.dataset.page));
+		});
+
+		function animateValue(el, target, { duration = 1400, decimals = 0, suffix = '', prefix = '' } = {}) {
+			const start = Number(el.textContent.replace(/[^0-9.]/g, '')) || 0;
+			const startTime = performance.now();
+			function frame(now) {
+				const progress = Math.min((now - startTime) / duration, 1);
+				const eased = 1 - Math.pow(1 - progress, 3);
+				const value = start + (target - start) * eased;
+				el.textContent = prefix + value.toFixed(decimals) + suffix;
+				if (progress < 1) {
+					requestAnimationFrame(frame);
+				}
+			}
+			requestAnimationFrame(frame);
+		}
+
+		function setupCounters() {
+			const observer = new IntersectionObserver(entries => {
+				entries.forEach(entry => {
+					if (!entry.isIntersecting) {
+						return;
+					}
+					const el = entry.target;
+					el.classList.add('visible');
+					if (el.hasAttribute('data-count')) {
+						const target = parseFloat(el.dataset.count) || 0;
+						const decimals = parseInt(el.dataset.decimals || '0', 10);
+						const suffix = el.dataset.suffix || '';
+						const valueEl = el.querySelector('.sketch-value') || el.querySelector('.stat-value');
+						if (valueEl) {
+							animateValue(valueEl, target, { decimals, suffix });
+						}
+					}
+					const progress = el.dataset.progress;
+					if (progress) {
+						const fill = el.querySelector('.progress-fill');
+						if (fill) {
+							requestAnimationFrame(() => {
+								fill.style.width = Math.min(parseFloat(progress), 100) + '%';
+							});
+						}
+					}
+					observer.unobserve(el);
+				});
+			}, { threshold: 0.2, rootMargin: '0px 0px -12% 0px' });
+
+			document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+		}
+
+		function cycleHeroWord() {
+			const target = document.querySelector('[data-hero-word]');
+			if (!target) {
+				return;
+			}
+			const words = ['human', 'certain', 'collaborative', 'sustainable', 'confident'];
+			let idx = 1;
+			setInterval(() => {
+				target.style.opacity = '0';
+				setTimeout(() => {
+					target.textContent = words[idx];
+					target.style.opacity = '1';
+					idx = (idx + 1) % words.length;
+				}, 200);
+			}, 2400);
+		}
+
+		function formatCurrency(value) {
+			return '₹' + Number(value).toLocaleString('en-IN');
+		}
+
+		function createStrengthChart(ages, strengths) {
+			const ctx = document.getElementById('strengthChart');
+			if (!ctx) {
+				return;
+			}
+			if (strengthChart) {
+				strengthChart.destroy();
+			}
+			if (typeof Chart === 'undefined') {
+				console.error('Chart.js is not loaded');
+				return;
+			}
+			strengthChart = new Chart(ctx.getContext('2d'), {
+				type: 'line',
+				data: {
+					labels: ages.map(age => age === 1 ? '1 day' : `${age} days`),
+					datasets: [{
+						label: 'Compressive strength (MPa)',
+						data: strengths,
+						borderColor: '#ff6b35',
+						backgroundColor: 'rgba(255, 107, 53, 0.15)',
+						borderWidth: 3,
+						fill: true,
+						tension: 0.35,
+						pointRadius: 5,
+						pointBackgroundColor: '#ff6b35',
+						pointBorderColor: '#fff',
+						pointBorderWidth: 2
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: { display: false },
+						tooltip: {
+							displayColors: false,
+							backgroundColor: 'rgba(31, 41, 55, 0.92)',
+							titleFont: { size: 14, family: 'Inter', weight: '600' },
+							bodyFont: { size: 13, family: 'Inter' }
+						}
+					},
+					scales: {
+						x: {
+							title: { display: true, text: 'Age (days)', color: '#4b5563', font: { size: 13, weight: '600' } },
+							grid: { color: 'rgba(15, 23, 42, 0.06)' },
+							ticks: { color: '#4b5563' }
+						},
+						y: {
+							title: { display: true, text: 'Strength (MPa)', color: '#4b5563', font: { size: 13, weight: '600' } },
+							beginAtZero: true,
+							grid: { color: 'rgba(15, 23, 42, 0.05)' },
+							ticks: { color: '#4b5563', callback: value => value + ' MPa' }
+						}
+					}
+				}
+			});
+		}
+
+		const predictionForm = document.getElementById('predictionForm');
+		const loadingBox = document.getElementById('loading');
+		const resultsPanel = document.getElementById('results');
+
+		if (predictionForm) {
+			predictionForm.addEventListener('submit', async event => {
+				event.preventDefault();
+				loadingBox.classList.add('active');
+				resultsPanel.classList.remove('active');
+
+				const formData = new FormData(predictionForm);
+				const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k, Number(v)]));
+
+				try {
+					const response = await fetch('/predict', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload)
+					});
+					if (!response.ok) {
+						throw new Error('Prediction failed, please try again.');
+					}
+					const data = await response.json();
+					if (data.error) {
+						throw new Error(data.error);
+					}
+
+					animateValue(document.getElementById('strengthValue'), Number(data.predicted_strength), { decimals: 2 });
+					document.getElementById('ratingStars').textContent = '⭐'.repeat(Number(data.rating));
+					document.getElementById('ratingText').textContent = data.rating_text;
+
+					animateValue(document.getElementById('wcRatio'), Number(data.water_cement_ratio), { decimals: 2 });
+					const wcStatus = document.getElementById('wcStatus');
+					wcStatus.textContent = data.wc_status;
+					wcStatus.style.color = data.wc_color || 'var(--text-soft)';
+
+					document.getElementById('cost').textContent = formatCurrency(data.cost_per_m3_inr);
+					const prices = data.material_prices || {};
+					document.getElementById('priceBreakdown').textContent = `Cement ${formatCurrency(prices.cement || 0)}/t · Slag ${formatCurrency(prices.slag || 0)}/t · Fly ash ${formatCurrency(prices.fly_ash || 0)}/t · Aggregates ${formatCurrency(prices.aggregates || 0)}/t`;
+
+					animateValue(document.getElementById('co2'), Number(data.co2_kg_per_m3), { decimals: 1, suffix: ' kg' });
+
+					const suitabilityMap = {
+						residential: '🏠 Residential buildings',
+						commercial: '🏢 Commercial complexes',
+						high_rise: '🏙️ High-rise structures',
+						bridges: '🌉 Bridges & infrastructure',
+						pavements: '🛣️ Pavements & roads',
+						foundations: '🏗️ Foundations'
+					};
+					const suitabilityGrid = document.getElementById('suitabilityGrid');
+					suitabilityGrid.innerHTML = '';
+					Object.entries(suitabilityMap).forEach(([key, label]) => {
+						const pill = document.createElement('div');
+						const ok = Boolean(data.suitability && data.suitability[key]);
+						pill.className = 'suitability-pill ' + (ok ? 'ok' : 'no');
+						pill.textContent = (ok ? '✅ ' : '❌ ') + label;
+						suitabilityGrid.appendChild(pill);
+					});
+
+					if (data.strength_chart) {
+						createStrengthChart(data.strength_chart.ages || [], data.strength_chart.strengths || []);
+					}
+
+					resultsPanel.classList.add('active');
+					resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				} catch (error) {
+					alert(error.message || 'Something went wrong while predicting.');
+				} finally {
+					loadingBox.classList.remove('active');
+				}
+			});
+		}
+
+		const optimizerForm = document.getElementById('optimizerForm');
+		const optimizeLoading = document.getElementById('optimizeLoading');
+		const mixResults = document.getElementById('mixResults');
+		const mixOptionsContainer = document.getElementById('mixOptionsContainer');
+
+		if (optimizerForm) {
+			optimizerForm.addEventListener('submit', async event => {
+				event.preventDefault();
+				optimizeLoading.classList.add('active');
+				mixResults.classList.remove('active');
+				mixOptionsContainer.innerHTML = '';
+
+				const formData = new FormData(optimizerForm);
+				const payload = Object.fromEntries(Array.from(formData.entries()).map(([k, v]) => [k.replace(/^opt_/, ''), Number(v)]));
+
+				document.getElementById('optResultStrength').textContent = payload.target_strength;
+				document.getElementById('optResultAge').textContent = payload.age;
+
+				try {
+					const response = await fetch('/optimize_mix', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(payload)
+					});
+					if (!response.ok) {
+						throw new Error('Unable to generate mix designs.');
+					}
+					const data = await response.json();
+					if (data.error) {
+						throw new Error(data.error);
+					}
+
+					(data.options || []).forEach(option => {
+						const card = document.createElement('article');
+						const badge = option.name && option.name.toLowerCase().includes('economical') ? 'Most Economical' : option.name && option.name.toLowerCase().includes('performance') ? 'High Performance' : option.name || 'Mix Option';
+						card.className = 'mix-card';
+						card.dataset.badge = badge;
+						card.innerHTML = `
+							<h3>${option.name}</h3>
+							<p class="mix-highlight">${formatCurrency(option.cost)}/m³ · ${option.predicted_strength.toFixed(2)} MPa · W/C ${option.wc_ratio.toFixed(3)}</p>
+							<p style="color: var(--text-soft); margin-bottom: 18px;">${option.description || ''}</p>
+							<div class="mix-props">
+								<div class="mix-prop"><span>Cement</span><strong>${option.cement.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Water</span><strong>${option.water.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Slag</span><strong>${option.slag.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Fly ash</span><strong>${option.fly_ash.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Coarse agg.</span><strong>${option.coarse_aggregate.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Fine agg.</span><strong>${option.fine_aggregate.toFixed(1)} kg</strong></div>
+								<div class="mix-prop"><span>Superpl.</span><strong>${option.superplasticizer.toFixed(1)} kg</strong></div>
+							</div>
+						`;
+						mixOptionsContainer.appendChild(card);
+					});
+
+					mixResults.classList.add('active');
+					mixResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				} catch (error) {
+					alert(error.message || 'Something went wrong while generating mix designs.');
+				} finally {
+					optimizeLoading.classList.remove('active');
+				}
+			});
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			setupCounters();
+			cycleHeroWord();
+		});
+	</script>
+</body>
+</html>
+
+
+
