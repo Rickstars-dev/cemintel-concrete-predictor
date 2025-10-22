@@ -1,5 +1,6 @@
 """
 Flask Web Application for Concrete Strength Prediction
+Version: 1.0.1 - Fixed route decorator syntax
 """
 from flask import Flask, render_template, request, jsonify
 import joblib
