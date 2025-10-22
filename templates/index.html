@@ -1136,12 +1136,13 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(payload)
 					});
-					if (!response.ok) {
-						throw new Error('Prediction failed, please try again.');
-					}
+					
 					const data = await response.json();
-					if (data.error) {
-						throw new Error(data.error);
+					
+					if (!response.ok || data.error) {
+						const errorMsg = data.error || `Prediction failed (Status: ${response.status})`;
+						console.error('Prediction error:', errorMsg, data);
+						throw new Error(errorMsg);
 					}
 
 					animateValue(document.getElementById('strengthValue'), Number(data.predicted_strength), { decimals: 2 });
@@ -1215,15 +1216,16 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(payload)
 					});
-					if (!response.ok) {
-						throw new Error('Unable to generate mix designs.');
-					}
-					const data = await response.json();
-					if (data.error) {
-						throw new Error(data.error);
+					
+					const mixData = await response.json();
+					
+					if (!response.ok || mixData.error) {
+						const errorMsg = mixData.error || `Unable to generate mix designs (Status: ${response.status})`;
+						console.error('Optimization error:', errorMsg, mixData);
+						throw new Error(errorMsg);
 					}
 
-					(data.options || []).forEach(option => {
+					(mixData.options || []).forEach(option => {
 						const card = document.createElement('article');
 						const badge = option.name && option.name.toLowerCase().includes('economical') ? 'Most Economical' : option.name && option.name.toLowerCase().includes('performance') ? 'High Performance' : option.name || 'Mix Option';
 						card.className = 'mix-card';

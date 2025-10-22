@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, jsonify
 import joblib
 import numpy as np
 import os
+import sys
 from train_mix_optimizer import generate_multiple_options
 
 app = Flask(__name__)
@@ -49,18 +50,30 @@ except Exception as e:
         'mae': 0.0
     }
 
+@app.route('/health')
+def health():
+    """
+    Health check endpoint to verify model loading
+    """
+    return jsonify({
+        'status': 'healthy' if model is not None else 'unhealthy',
+        'model_loaded': model is not None,
+        'scaler_loaded': scaler is not None,
+        'feature_names': feature_names,
+        'metadata': metadata,
+        'python_version': f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    })
+
 @app.route('/')
 def index():
     """
     Landing page / prediction form
     """
-    return render_template('index.html', 
+    return render_template('index.html',
                          features=feature_names,
                          r2_score=metadata['r2_score'],
                          mae=metadata['mae'],
-                         model_name=metadata['model_name'])
-
-@app.route('/predict', methods=['POST'])
+                         model_name=metadata['model_name'])@app.route('/predict', methods=['POST'])
 def predict():
     """
     Make concrete strength prediction
