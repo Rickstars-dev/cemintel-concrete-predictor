@@ -36,8 +36,18 @@ try:
     print(f"   MAE: {metadata['mae']:.2f} MPa")
 except Exception as e:
     print(f"❌ Error loading model: {e}")
+    import traceback
+    print(traceback.format_exc())
+    # Set all variables to None if loading fails
     model = None
     scaler = None
+    feature_names = ['cement', 'blast_furnace_slag', 'fly_ash', 'water', 
+                     'superplasticizer', 'coarse_aggregate', 'fine_aggregate', 'age']
+    metadata = {
+        'model_name': 'Model Loading Failed',
+        'r2_score': 0.0,
+        'mae': 0.0
+    }
 
 @app.route('/')
 def index():
