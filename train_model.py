@@ -136,11 +136,11 @@ if best_r2 >= 0.85:
 else:
     print(f"   ⚠️  Below target, but still good performance")
 
-# Save best model
+# Save best model with protocol 4 for better compatibility
 print(f"\n💾 Saving model files...")
-joblib.dump(best_model, 'model/concrete_model.pkl')
-joblib.dump(scaler, 'model/scaler.pkl')
-joblib.dump(list(X.columns), 'model/feature_names.pkl')
+joblib.dump(best_model, 'model/concrete_model.pkl', compress=3, protocol=4)
+joblib.dump(scaler, 'model/scaler.pkl', compress=3, protocol=4)
+joblib.dump(list(X.columns), 'model/feature_names.pkl', protocol=4)
 
 metadata = {
     'model_name': best_model_name,
@@ -150,7 +150,7 @@ metadata = {
     'samples': len(df),
     'features': list(X.columns)
 }
-joblib.dump(metadata, 'model/metadata.pkl')
+joblib.dump(metadata, 'model/metadata.pkl', protocol=4)
 
 print(f"   ✅ model/concrete_model.pkl")
 print(f"   ✅ model/scaler.pkl")
