@@ -136,11 +136,34 @@ if best_r2 >= 0.85:
 else:
     print(f"   ⚠️  Below target, but still good performance")
 
-# Save best model with protocol 3 for maximum compatibility across NumPy versions
-# Protocol 3 avoids NumPy BitGenerator serialization issues
+# Save best model - Remove random state to avoid NumPy BitGenerator serialization issues
 print(f"\n💾 Saving model files...")
 import pickle
-joblib.dump(best_model, 'model/concrete_model.pkl', compress=3, protocol=3)
+
+# Clean the model by removing random state attributes that cause BitGenerator errors
+def clean_model_for_pickle(model):
+    """Remove NumPy random state from model to avoid BitGenerator serialization issues"""
+    import copy
+    cleaned_model = copy.deepcopy(model)
+    
+    # For Gradient Boosting models
+    if hasattr(cleaned_model, '_random_state'):
+        cleaned_model._random_state = None
+    if hasattr(cleaned_model, 'random_state'):
+        # Store the seed but not the state object
+        if hasattr(cleaned_model.random_state, 'bit_generator'):
+            cleaned_model.random_state = 42  # Reset to seed instead of state object
+    
+    # For ensemble models with estimators
+    if hasattr(cleaned_model, 'estimators_'):
+        for estimator in cleaned_model.estimators_:
+            if hasattr(estimator, '_random_state'):
+                estimator._random_state = None
+    
+    return cleaned_model
+
+cleaned_best_model = clean_model_for_pickle(best_model)
+joblib.dump(cleaned_best_model, 'model/concrete_model.pkl', compress=3, protocol=3)
 joblib.dump(scaler, 'model/scaler.pkl', compress=3, protocol=3)
 joblib.dump(list(X.columns), 'model/feature_names.pkl', protocol=3)
 
