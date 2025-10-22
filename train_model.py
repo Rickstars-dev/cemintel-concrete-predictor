@@ -136,11 +136,13 @@ if best_r2 >= 0.85:
 else:
     print(f"   ⚠️  Below target, but still good performance")
 
-# Save best model with protocol 4 for better compatibility
+# Save best model with protocol 3 for maximum compatibility across NumPy versions
+# Protocol 3 avoids NumPy BitGenerator serialization issues
 print(f"\n💾 Saving model files...")
-joblib.dump(best_model, 'model/concrete_model.pkl', compress=3, protocol=4)
-joblib.dump(scaler, 'model/scaler.pkl', compress=3, protocol=4)
-joblib.dump(list(X.columns), 'model/feature_names.pkl', protocol=4)
+import pickle
+joblib.dump(best_model, 'model/concrete_model.pkl', compress=3, protocol=3)
+joblib.dump(scaler, 'model/scaler.pkl', compress=3, protocol=3)
+joblib.dump(list(X.columns), 'model/feature_names.pkl', protocol=3)
 
 metadata = {
     'model_name': best_model_name,
@@ -150,7 +152,7 @@ metadata = {
     'samples': len(df),
     'features': list(X.columns)
 }
-joblib.dump(metadata, 'model/metadata.pkl', protocol=4)
+joblib.dump(metadata, 'model/metadata.pkl', protocol=3)
 
 print(f"   ✅ model/concrete_model.pkl")
 print(f"   ✅ model/scaler.pkl")
