@@ -73,7 +73,9 @@ def index():
                          features=feature_names,
                          r2_score=metadata['r2_score'],
                          mae=metadata['mae'],
-                         model_name=metadata['model_name'])@app.route('/predict', methods=['POST'])
+                         model_name=metadata['model_name'])
+
+@app.route('/predict', methods=['POST'])
 def predict():
     """
     Make concrete strength prediction
