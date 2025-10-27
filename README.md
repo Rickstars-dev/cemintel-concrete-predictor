@@ -2,13 +2,13 @@
 
 ## 🎯 Project Overview
 
-An AI-powered web application that predicts concrete compressive strength with **92.6% accuracy** (R² = 0.926).
+An AI-powered web application that predicts concrete compressive strength with **92.4% accuracy** (R² = 0.924).
 
 Built with Machine Learning to help construction professionals optimize concrete mixes for safety and cost efficiency.
 
 ## ✨ Features
 
-- 🤖 **Advanced ML Model** - Gradient Boosting with 92.6% accuracy
+- 🤖 **Advanced ML Model** - Gradient Boosting with 92.4% accuracy
 - 📊 **Real-time Predictions** - Instant strength calculations
 - 💰 **Cost Estimation** - Per m³ cost analysis
 - 🌍 **CO₂ Calculator** - Environmental impact assessment
@@ -24,9 +24,9 @@ Built with Machine Learning to help construction professionals optimize concrete
 
 ## 📊 Model Performance
 
-- **R² Score:** 0.926 (92.6%)
-- **MAE:** ±2.89 MPa
-- **RMSE:** 4.36 MPa
+- **R² Score:** 0.924 (92.4%)
+- **MAE:** ±2.92 MPa
+- **RMSE:** 4.42 MPa
 - **CV R² (5-fold):** 0.922
 
 ## 🚀 Quick Start
@@ -110,7 +110,7 @@ The app calculates CO₂ emissions per m³ and shows savings when using:
 - ✅ **Safety-Critical** - Concrete strength determines building safety
 - ✅ **Cost Impact** - Optimize $billions in construction materials
 - ✅ **Environmental** - Reduce cement (8% of global CO₂ emissions)
-- ✅ **High Accuracy** - 92.6% R² score with clean physics-based features
+- ✅ **High Accuracy** - 92.4% R² score with clean physics-based features
 - ✅ **Practical** - Real-world application for construction industry
 
 ## 📚 References
@@ -121,7 +121,7 @@ The app calculates CO₂ emissions per m³ and shows savings when using:
 ## 👨‍💻 Author
 
 **Abhishek Chandra**
-- Achieving 92.6% accuracy on concrete strength prediction
+- Achieving 92.4% accuracy on concrete strength prediction
 
 ## 📄 License
 

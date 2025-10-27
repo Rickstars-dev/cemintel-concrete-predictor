@@ -164,8 +164,8 @@ Render should auto-detect settings from `render.yaml`, but verify:
 🔍 Loading model from: /opt/render/project/src
 ✅ Model loaded successfully!
    Model: Gradient Boosting
-   R² Score: 0.9263
-   MAE: 2.89 MPa
+   R² Score: 0.9240
+   MAE: 2.92 MPa
 
 [INFO] Starting gunicorn 21.0.0
 [INFO] Listening at: http://0.0.0.0:10000
